@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 import { passwordSchema, usernameSchema } from "@/lib/auth/credentials"
-import { hasAdminRole, ROLES, type Role } from "@/lib/auth/roles"
+import { ROLES, type Role } from "@/lib/auth/roles"
 
 const userFields = z.object({
   fullName: z.string().trim().min(1, "Enter the person's full name").max(100, "Use at most 100 characters"),
@@ -10,16 +10,10 @@ const userFields = z.object({
   projectIds: z.array(z.uuid()).default([]),
 })
 
-// Admin/PO can access every project; everyone else needs at least one (FR-PRJ-001).
-const needsProject = (v: { roles: Role[]; projectIds: string[] }) =>
-  hasAdminRole(v.roles) || v.projectIds.length > 0
-const projectRule = { path: ["projectIds"], message: "Assign at least one project" }
+// Projects are optional: users can be created first and added to projects later.
+export const updateUserSchema = userFields
 
-export const updateUserSchema = userFields.refine(needsProject, projectRule)
-
-export const createUserSchema = userFields
-  .extend({ username: usernameSchema, password: passwordSchema })
-  .refine(needsProject, projectRule)
+export const createUserSchema = userFields.extend({ username: usernameSchema, password: passwordSchema })
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
 export type CreateUserInput = z.infer<typeof createUserSchema>

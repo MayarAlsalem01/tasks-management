@@ -31,12 +31,21 @@ async function replaceRoles(tx: Tx, userId: string, roles: Role[], actorId: stri
   await tx.insert(userRoles).values(roles.map((role) => ({ userId, role, grantedBy: actorId })))
 }
 
-/** Makes `projectIds` the user's exact memberships. Admin/PO keep theirs (they see every project). */
+/**
+ * Makes `projectIds` the user's exact memberships (an empty list removes them all).
+ * Admin/PO keep theirs untouched, since they can see every project anyway.
+ */
 async function replaceMemberships(tx: Tx, userId: string, input: { roles: Role[]; projectIds: string[] }, actorId: string) {
   if (hasAdminRole(input.roles)) return
   await tx
     .delete(projectMembers)
-    .where(and(eq(projectMembers.userId, userId), notInArray(projectMembers.projectId, input.projectIds)))
+    .where(
+      and(
+        eq(projectMembers.userId, userId),
+        input.projectIds.length ? notInArray(projectMembers.projectId, input.projectIds) : undefined,
+      ),
+    )
+  if (!input.projectIds.length) return
   await tx
     .insert(projectMembers)
     .values(input.projectIds.map((projectId) => ({ projectId, userId, addedBy: actorId })))

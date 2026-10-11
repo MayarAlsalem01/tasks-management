@@ -1,9 +1,17 @@
-export type DevStatus = "not-started" | "in-progress" | "blocked" | "done"
+import type {
+  devStatusEnum,
+  priorityEnum,
+  prStateEnum,
+  qaStatusEnum,
+  specStatusEnum,
+} from "@/lib/db/schema"
 
-export type QaStatus = "not-tested" | "passed" | "failed"
+export type DevStatus = (typeof devStatusEnum.enumValues)[number]
 
-export type SpecStatus = "draft" | "pending-review" | "approved"
+export type QaStatus = (typeof qaStatusEnum.enumValues)[number]
 
-export type Priority = "critical" | "high" | "medium" | "low"
+export type SpecStatus = (typeof specStatusEnum.enumValues)[number]
 
-export type PrState = "open" | "merged" | "draft" | "closed"
+export type Priority = (typeof priorityEnum.enumValues)[number]
+
+export type PrState = (typeof prStateEnum.enumValues)[number]

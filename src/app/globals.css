@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Specline is light-only; the `dark` variant is kept so shadcn's dark: classes compile. */
+/* The Fractals design system is light-only; the `dark` variant is kept so shadcn's dark: classes compile. */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

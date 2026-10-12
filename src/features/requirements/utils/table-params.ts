@@ -12,7 +12,7 @@ import {
   SPEC_STATUS_LABEL,
   SpecStatus,
 } from "../types/status"
-import { DrawerTab, FrGroupBy, UNASSIGNED } from "../types/table"
+import { BoardLanes, DrawerTab, FrGroupBy, UNASSIGNED } from "../types/table"
 
 type Params = Record<string, string | string[] | undefined>
 
@@ -20,7 +20,7 @@ const single = z.preprocess((v) => (Array.isArray(v) ? v[0] : v), z.string().tri
 const text = single.transform((v) => v || undefined)
 const oneOf = <T extends Record<string, string>>(values: T) => single.pipe(z.enum(values).optional()).catch(undefined)
 
-/** Project-table state from the URL. Unknown or malformed values are dropped, never an error. */
+/** Project-view state (table and board) from the URL. Unknown or malformed values are dropped, never an error. */
 const tableParamsSchema = z.object({
   [SearchParam.Query]: text,
   [SearchParam.Assignee]: text,
@@ -30,6 +30,7 @@ const tableParamsSchema = z.object({
   [SearchParam.Spec]: oneOf(SpecStatus),
   [SearchParam.Step]: text,
   [SearchParam.Group]: oneOf(FrGroupBy).transform((v) => v ?? FrGroupBy.Activity),
+  [SearchParam.Lanes]: oneOf(BoardLanes).transform((v) => v ?? BoardLanes.Activity),
   [SearchParam.Archived]: single.transform((v) => v === "1"),
   [SearchParam.Fr]: text,
   [SearchParam.Panel]: oneOf(DrawerTab).transform((v) => v ?? DrawerTab.Details),

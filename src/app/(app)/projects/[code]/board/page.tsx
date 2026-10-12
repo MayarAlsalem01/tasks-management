@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/ui/coming-soon"
+import { RequirementsBoardPage } from "@/features/requirements/server"
 
-export default function ProjectBoardPage() {
-  return <ComingSoon title="Board" description="The Kanban board with drag-and-drop between dev statuses arrives in the next stage." />
+export default async function ProjectBoardPage({ params }: PageProps<"/projects/[code]/board">) {
+  return <RequirementsBoardPage params={params} />
 }

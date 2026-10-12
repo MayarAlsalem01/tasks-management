@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import type { FrRow } from "../types/requirement"
-import { DEV_STATUSES, DevStatus, QA_STATUSES, QaStatus, SpecStatus } from "../types/status"
-import { devDoneGate, type FrPermissions } from "../utils/permissions"
+import { DEV_STATUSES, DevStatus, QA_STATUSES, QaStatus } from "../types/status"
+import { devDoneGate, inProgressWarning, type FrPermissions } from "../utils/permissions"
 import { useFr } from "./fr-context"
 import { DevStatusPill, QaStatusPill } from "./status-pills"
 
@@ -54,8 +54,8 @@ function devOptionNote(fr: FrRow, status: DevStatus, permissions: FrPermissions)
     if (gate.kind === "blocked") return { disabled: true, note: `${gate.pending} of ${gate.total} acceptance criteria are not yet dev-done.` }
   }
   if (status === DevStatus.InProgress && fr.dev !== status) {
-    if (fr.openIssues) return { warn: true, note: "Has open issues. You can start, but check them first." }
-    if (fr.spec === SpecStatus.PendingReview) return { warn: true, note: "Spec is pending review. You can start; text may still change." }
+    const note = inProgressWarning(fr)
+    if (note) return { warn: true, note }
   }
   return {}
 }

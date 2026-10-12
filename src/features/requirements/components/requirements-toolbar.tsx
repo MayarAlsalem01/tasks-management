@@ -1,52 +1,19 @@
 "use client"
 
 import { cn } from "cn"
-import { Columns2Icon, SearchIcon } from "lucide-react"
-import { useState } from "react"
+import { Columns2Icon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FILTER_ALL, FilterSelect } from "@/components/ui/filter-select"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
+import { FilterSelect } from "@/components/ui/filter-select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Role } from "@/lib/auth/roles"
 import { SearchParam } from "@/lib/routes"
 
 import type { ProjectPerson } from "../types/requirement"
-import { DEV_STATUS_LABEL, PRIORITY_LABEL, QA_STATUS_LABEL, SPEC_STATUS_LABEL } from "../types/status"
-import { COLUMN_LABEL, FrGroupBy, GROUP_BY_LABEL, UNASSIGNED, type FrColumn } from "../types/table"
+import { COLUMN_LABEL, FrGroupBy, GROUP_BY_LABEL, type FrColumn } from "../types/table"
 import { FR_COLUMNS } from "../utils/table-layout"
-import { hasActiveFilters, type TableParams } from "../utils/table-params"
-
-const optionsFrom = (allLabel: string, labels: Record<string, string>) => [
-  { value: FILTER_ALL, label: allLabel },
-  ...Object.entries(labels).map(([value, label]) => ({ value, label })),
-]
-
-/** Search box that writes to the URL as you type and empties itself when filters are cleared. */
-function SearchBox({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const [text, setText] = useState(value)
-  const [synced, setSynced] = useState(value)
-  if (value !== synced) {
-    setSynced(value)
-    if (!value) setText("")
-  }
-  return (
-    <InputGroup className="h-8 w-full bg-white sm:w-50">
-      <InputGroupAddon><SearchIcon /></InputGroupAddon>
-      <InputGroupInput
-        type="search"
-        aria-label="Search requirements"
-        placeholder="Search ID or text"
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value)
-          onChange(e.target.value.trim())
-        }}
-      />
-    </InputGroup>
-  )
-}
+import type { TableParams } from "../utils/table-params"
+import { RequirementFilters } from "./requirement-filters"
 
 function ColumnsMenu({ visible, onToggle }: { visible: FrColumn[]; onToggle: (column: FrColumn) => void }) {
   return (
@@ -77,18 +44,9 @@ type ToolbarProps = {
 
 /** Filters, grouping, column visibility and the archived toggle for the project table. */
 export function RequirementsToolbar({ params, people, columns, onToggleColumn, update, onClear }: ToolbarProps) {
-  const set = (key: string) => (value: string | undefined) => update({ [key]: value })
-  const developers = people.filter((p) => p.roles.includes(Role.Developer))
   return (
     <div className="flex flex-none flex-wrap items-center gap-2 border-b border-gray-150 px-4 py-3 lg:px-6">
-      <SearchBox value={params.q ?? ""} onChange={(v) => update({ [SearchParam.Query]: v })} />
-      <FilterSelect hideLabel label="Assignee" value={params.assignee} onChange={set(SearchParam.Assignee)}
-        options={[{ value: FILTER_ALL, label: "Assignee" }, { value: UNASSIGNED, label: "Unassigned" }, ...developers.map((p) => ({ value: p.id, label: p.fullName }))]} />
-      <FilterSelect hideLabel label="Priority" value={params.priority} onChange={set(SearchParam.Priority)} options={optionsFrom("Priority", PRIORITY_LABEL)} className="min-w-0" />
-      <FilterSelect hideLabel label="Dev status" value={params.dev} onChange={set(SearchParam.Dev)} options={optionsFrom("Dev status", DEV_STATUS_LABEL)} className="min-w-0" />
-      <FilterSelect hideLabel label="QA status" value={params.qa} onChange={set(SearchParam.Qa)} options={optionsFrom("QA status", QA_STATUS_LABEL)} className="min-w-0" />
-      <FilterSelect hideLabel label="Spec status" value={params.spec} onChange={set(SearchParam.Spec)} options={optionsFrom("Spec status", SPEC_STATUS_LABEL)} className="min-w-0" />
-      {hasActiveFilters(params) && <Button variant="link" className="px-2!" onClick={onClear}>Clear</Button>}
+      <RequirementFilters params={params} people={people} update={update} onClear={onClear} />
       <span className="flex-1" />
       <FilterSelect label="Group" value={params.group} onChange={(v) => update({ [SearchParam.Group]: v === FrGroupBy.Activity ? undefined : v })} options={Object.entries(GROUP_BY_LABEL).map(([value, label]) => ({ value, label }))} />
       <ColumnsMenu visible={columns} onToggle={onToggleColumn} />

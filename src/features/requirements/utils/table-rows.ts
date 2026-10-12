@@ -45,7 +45,7 @@ export type TableItem =
   | { kind: "fr"; row: FrRow }
 
 /** Groups keep first-appearance order, so they follow the FR order (activity, step, sort). */
-function groupBy(rows: readonly FrRow[], keyOf: (fr: FrRow) => string) {
+export function groupBy(rows: readonly FrRow[], keyOf: (fr: FrRow) => string) {
   const groups = new Map<string, FrRow[]>()
   for (const fr of rows) groups.set(keyOf(fr), [...(groups.get(keyOf(fr)) ?? []), fr])
   return groups

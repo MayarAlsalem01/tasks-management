@@ -1,5 +1,8 @@
 import { hasAdminRole, Role } from "@/lib/auth/roles"
 
+import type { FrRow } from "../types/requirement"
+import { SpecStatus } from "../types/status"
+
 /** What a user may do on FRs in a project they can open (FRS §2 RBAC, Role Variants spec). */
 export type FrPermissions = {
   /** Admin/PO: scope, text, metadata, assignees, ACs, archive, Dev-Done override. */
@@ -38,4 +41,14 @@ export function devDoneGate(acs: readonly { devDone: boolean }[], permissions: F
   return permissions.canManage
     ? { kind: "override", pending, total: acs.length }
     : { kind: "blocked", pending, total: acs.length }
+}
+
+/**
+ * Why starting work needs a second look (FR-WKF-003): open issues or a spec still pending
+ * review don't block In progress, but the user is warned. `undefined` when there's nothing to say.
+ */
+export function inProgressWarning(fr: Pick<FrRow, "openIssues" | "spec">) {
+  if (fr.openIssues) return "Has open issues. You can start, but check them first."
+  if (fr.spec === SpecStatus.PendingReview) return "Spec is pending review. You can start; text may still change."
+  return undefined
 }

@@ -30,6 +30,8 @@ export const SearchParam = {
   Spec: "spec",
   /** Table grouping. */
   Group: "group",
+  /** Board swimlanes. */
+  Lanes: "lanes",
   /** `1` shows archived rows. */
   Archived: "archived",
 } as const

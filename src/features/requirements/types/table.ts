@@ -14,6 +14,18 @@ export const GROUP_BY_LABEL: Record<FrGroupBy, string> = {
   none: "None",
 }
 
+/** How the board splits cards into swimlanes. */
+export const BoardLanes = {
+  Activity: "activity",
+  None: "none",
+} as const
+export type BoardLanes = (typeof BoardLanes)[keyof typeof BoardLanes]
+
+export const BOARD_LANES_LABEL: Record<BoardLanes, string> = {
+  activity: "Activity",
+  none: "None",
+}
+
 /** Optional table columns (ID and Requirement are always shown). */
 export const FrColumn = {
   Priority: "priority",

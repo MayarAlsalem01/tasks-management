@@ -1,26 +1,227 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* The Fractals design system is light-only; the `dark` variant is kept so shadcn's dark: classes compile. */
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Radius: xs/sm 4 (pills, tags), md 6 (buttons, inputs), lg 8 (menus, cards), xl 12 (modals) */
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* Neutrals (slightly cool) */
+  --color-gray-*: initial;
+  --color-gray-0: #ffffff;
+  --color-gray-25: #f7f8fa;
+  --color-gray-50: #f2f3f6;
+  --color-gray-75: #eef0f3;
+  --color-gray-100: #e8eaef;
+  --color-gray-150: #e3e5ea;
+  --color-gray-200: #d5d8df;
+  --color-gray-300: #c3c7d1;
+  --color-gray-400: #9298a6;
+  --color-gray-500: #6b7180;
+  --color-gray-600: #5b6170;
+  --color-gray-650: #4b5160;
+  --color-gray-700: #3e4350;
+  --color-gray-900: #171a21;
+
+  /* Primary · Cobalt */
+  --color-cobalt-50: #eef2ff;
+  --color-cobalt-100: #dce4fe;
+  --color-cobalt-200: #b9c8fc;
+  --color-cobalt-500: #3456d9;
+  --color-cobalt-600: #2945b8;
+  --color-cobalt-700: #213895;
+
+  /* Semantic · fg / bg / border / solid */
+  --color-success-fg: #186640;
+  --color-success-strong: #145a37;
+  --color-success-bg: #e7f5ee;
+  --color-success-tint: #ddf1e6;
+  --color-success-border: #a8dabf;
+  --color-success-solid: #1f7a4d;
+  --color-success-mark: #2e9e63;
+
+  --color-warning-fg: #8a5300;
+  --color-warning-strong: #6e4000;
+  --color-warning-bg: #fff4de;
+  --color-warning-subtle: #fffbf2;
+  --color-warning-live: #fff9eb;
+  --color-warning-border: #f2cf8a;
+  --color-warning-solid: #a15800;
+  --color-warning-solid-hover: #844800;
+  --color-warning-mark: #c27a00;
+
+  --color-danger-fg: #b42318;
+  --color-danger-strong: #a3271b;
+  --color-danger-bg: #fdecea;
+  --color-danger-tint: #fde3df;
+  --color-danger-subtle: #fffbfa;
+  --color-danger-border: #f4b5ae;
+  --color-danger-solid: #c4281c;
+  --color-danger-mark: #d92d20;
+
+  --color-info-fg: #213895;
+  --color-info-bg: #eef2ff;
+  --color-info-border: #b9c8fc;
+  --color-info-solid: #3456d9;
+
+  /* Status-specific accents */
+  --color-spec: #6941c6;
+  --color-merged: #5b3ab0;
+  --color-priority-high: #c2410c;
+  --color-priority-high-fg: #b23a0a;
+  --color-priority-medium: #b87300;
+  --color-live-ring: #f5b88e;
+
+  /* Type scale */
+  --text-display: 28px;
+  --text-display--line-height: 36px;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 600;
+  --text-title-1: 22px;
+  --text-title-1--line-height: 30px;
+  --text-title-1--letter-spacing: -0.01em;
+  --text-title-1--font-weight: 600;
+  --text-title-2: 16px;
+  --text-title-2--line-height: 24px;
+  --text-title-2--font-weight: 500;
+  --text-title-3: 14px;
+  --text-title-3--line-height: 20px;
+  --text-title-3--font-weight: 600;
+  --text-body: 14px;
+  --text-body--line-height: 22px;
+  --text-ui: 13px;
+  --text-ui--line-height: 20px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-overline: 11px;
+  --text-overline--line-height: 16px;
+  --text-overline--letter-spacing: 0.04em;
+
+  /* Elevation */
+  --shadow-e1: 0 1px 2px rgba(23, 26, 33, 0.06);
+  --shadow-e2: 0 0 0 1px rgba(23, 26, 33, 0.08), 0 6px 16px rgba(23, 26, 33, 0.1);
+  --shadow-e3: 0 0 0 1px rgba(23, 26, 33, 0.08), 0 20px 48px rgba(23, 26, 33, 0.18);
+  --shadow-drawer: -12px 0 32px rgba(23, 26, 33, 0.08);
+  --shadow-focus: 0 0 0 2px #fff, 0 0 0 4px var(--color-cobalt-500);
+  --shadow-input-focus: 0 0 0 3px rgba(52, 86, 217, 0.22);
+
+  --animate-pulse-ring: sl-pulse 1.8s ease-out infinite;
+  --animate-spin-fast: sl-spin 0.8s linear infinite;
+  --animate-shake: sl-shake 0.5s;
+
+  @keyframes sl-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    100% {
+      transform: scale(2.8);
+      opacity: 0;
+    }
+  }
+  @keyframes sl-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-7px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    60% {
+      transform: translateX(-4px);
+    }
+    80% {
+      transform: translateX(3px);
+    }
+  }
+  @keyframes sl-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --background: #f7f8fa;
+  --foreground: #171a21;
+  --card: #ffffff;
+  --card-foreground: #171a21;
+  --popover: #ffffff;
+  --popover-foreground: #171a21;
+  --primary: #3456d9;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --secondary-foreground: #171a21;
+  --muted: #f2f3f6;
+  --muted-foreground: #5b6170;
+  --accent: #eef0f3;
+  --accent-foreground: #171a21;
+  --destructive: #c4281c;
+  --border: #e3e5ea;
+  --input: #d5d8df;
+  --ring: #3456d9;
+  --radius: 8px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-ui text-foreground;
+  }
+  a {
+    @apply text-cobalt-600 hover:text-cobalt-700;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+    }
+  }
 }

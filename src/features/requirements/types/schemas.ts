@@ -19,6 +19,8 @@ export const qaValue = z.enum(QaStatus)
 
 export const createActivitySchema = z.object({ projectId: idSchema, name })
 export const createStepSchema = z.object({ activityId: idSchema, name })
+export const renameActivitySchema = z.object({ activityId: idSchema, name })
+export const renameStepSchema = z.object({ stepId: idSchema, name })
 
 const title = z.string().trim().min(1, "Enter the requirement").max(255, "Use at most 255 characters")
 const description = z.string().trim().max(5000, "Use at most 5000 characters")

@@ -22,6 +22,8 @@ import {
   notesSchema,
   PR_URL_PATTERN,
   pullRequestSchema,
+  renameActivitySchema,
+  renameStepSchema,
   reportDefectSchema,
   setAssigneesSchema,
   setDevStatusSchema,
@@ -32,6 +34,7 @@ import { archiveAc, createAc, moveAc, updateAcText } from "./ac-mutations"
 import { addComment, addPullRequest, setAssignees, updateFrFields, updateNotes } from "./fr-mutations"
 import { loadFr } from "./requirement-context"
 import { reportDefect, setAcDevDone, setAcQaPassed, setDevStatus, setQaStatus } from "./status-mutations"
+import { deleteActivity, deleteStep, renameActivity, renameStep } from "./structure-edits"
 import { createActivity, createFr, createStep, setFrArchived } from "./structure-mutations"
 
 /**
@@ -69,6 +72,28 @@ export async function createActivityAction(_prev: ActionState, formData: FormDat
 export async function createStepAction(_prev: ActionState, formData: FormData) {
   const input = { activityId: formData.get("activityId"), name: formData.get("name") }
   return run(createStepSchema, input, "createStep", (d, v) => createStep(d.activityId, d.name, v), "Step created")
+}
+
+export async function renameActivityAction(_prev: ActionState, formData: FormData) {
+  const input = { activityId: formData.get("activityId"), name: formData.get("name") }
+  return run(renameActivitySchema, input, "renameActivity", (d, v) => renameActivity(d.activityId, d.name, v), "Activity renamed")
+}
+
+export async function renameStepAction(_prev: ActionState, formData: FormData) {
+  const input = { stepId: formData.get("stepId"), name: formData.get("name") }
+  return run(renameStepSchema, input, "renameStep", (d, v) => renameStep(d.stepId, d.name, v), "Step renamed")
+}
+
+const activityIdInput = z.object({ activityId: idSchema })
+/** Deletes an activity with its steps and FRs (soft delete, FR-PRJ-003). */
+export async function deleteActivityAction(input: z.input<typeof activityIdInput>) {
+  return run(activityIdInput, input, "deleteActivity", (d, v) => deleteActivity(d.activityId, v), "Activity deleted")
+}
+
+const stepIdInput = z.object({ stepId: idSchema })
+/** Deletes a step with its FRs (soft delete, FR-PRJ-003). */
+export async function deleteStepAction(input: z.input<typeof stepIdInput>) {
+  return run(stepIdInput, input, "deleteStep", (d, v) => deleteStep(d.stepId, v), "Step deleted")
 }
 
 /** Creates an FR from the New FR dialog; the success message carries the new code. */

@@ -23,6 +23,8 @@ export const AuditAction = {
   ResetPassword: "RESET_PASSWORD",
   Archive: "ARCHIVE",
   Restore: "RESTORE",
+  /** Soft delete (FR-PRJ-003) of something that has no restore, e.g. an activity or step. */
+  Delete: "DELETE",
   OverrideDevDone: "OVERRIDE_DEV_DONE",
 } as const
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]

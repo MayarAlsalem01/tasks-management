@@ -52,6 +52,11 @@ export function requirePermission(permissions: FrPermissions, key: keyof FrPermi
   if (!permissions[key]) throw new AppError("FORBIDDEN", message)
 }
 
+/** Enforces that only Admins and Product Owners change the Activity → Step structure (FRS §2). */
+export function requireManager(viewer: Viewer) {
+  requirePermission(frPermissions(viewer.roles), "canManage", "Only Admins and Product Owners can change the project structure.")
+}
+
 /** Active ACs of an FR, in order, for gating and "all done" checks. */
 export async function activeAcs(executor: DbExecutor, frId: string) {
   return executor

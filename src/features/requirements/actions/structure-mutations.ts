@@ -1,6 +1,6 @@
 import "server-only"
 
-import { and, eq, isNull, max } from "drizzle-orm"
+import { eq, max } from "drizzle-orm"
 
 import { assertProjectAccess } from "@/features/projects/server"
 import { AuditAction, AuditEntity, recordAudit } from "@/lib/audit"
@@ -13,14 +13,8 @@ import { AppError } from "@/lib/errors"
 import type { CreateFrInput } from "../types/schemas"
 import { formatFrCode, nextSequence } from "../utils/codes"
 import { assertAssignable, replaceAssignees } from "./assignment"
-import { loadFr, requirePermission, type Viewer } from "./requirement-context"
-import { frPermissions } from "../utils/permissions"
-
-const MANAGE_ONLY = "Only Admins and Product Owners can change the project structure."
-
-function requireManager(viewer: Viewer) {
-  requirePermission(frPermissions(viewer.roles), "canManage", MANAGE_ONLY)
-}
+import { loadFr, requireManager, requirePermission, type Viewer } from "./requirement-context"
+import { loadActivity, loadStep } from "./structure-nodes"
 
 /** Creates an activity at the end of the project's list (FR-PRJ-002). Admin/PO only. */
 export async function createActivity(projectId: string, name: string, viewer: Viewer) {
@@ -39,11 +33,7 @@ export async function createActivity(projectId: string, name: string, viewer: Vi
 /** Creates a step at the end of an activity (FR-PRJ-002). Admin/PO only. */
 export async function createStep(activityId: string, name: string, viewer: Viewer) {
   requireManager(viewer)
-  const [activity] = await db
-    .select({ id: activities.id, projectId: activities.projectId })
-    .from(activities)
-    .where(and(eq(activities.id, activityId), isNull(activities.deletedAt)))
-  if (!activity) throw new AppError("NOT_FOUND", "This activity doesn't exist anymore.", { field: "activityId" })
+  const activity = await loadActivity(activityId)
   await assertProjectAccess(activity.projectId, viewer, { write: true })
   await db.transaction(async (tx) => {
     const [{ last }] = await tx.select({ last: max(steps.sortOrder) }).from(steps).where(eq(steps.activityId, activity.id))
@@ -53,16 +43,6 @@ export async function createStep(activityId: string, name: string, viewer: Viewe
       .returning({ id: steps.id })
     await recordAudit(tx, { userId: viewer.id, projectId: activity.projectId, entityName: AuditEntity.Step, entityId: step.id, action: AuditAction.Create, newValues: { name } })
   })
-}
-
-async function loadStep(stepId: string) {
-  const [step] = await db
-    .select({ id: steps.id, projectId: activities.projectId })
-    .from(steps)
-    .innerJoin(activities, and(eq(activities.id, steps.activityId), isNull(activities.deletedAt)))
-    .where(and(eq(steps.id, stepId), isNull(steps.deletedAt)))
-  if (!step) throw new AppError("NOT_FOUND", "This step doesn't exist anymore.", { field: "stepId" })
-  return step
 }
 
 /**

@@ -15,7 +15,7 @@ import {
 import type { FrRow } from "../types/requirement"
 import { DEV_STATUSES, DevStatus, QA_STATUSES, QaStatus } from "../types/status"
 import { devDoneGate, inProgressWarning, type FrPermissions } from "../utils/permissions"
-import { useFr } from "./fr-context"
+import { useFrActions } from "./fr-context"
 import { DevStatusPill, QaStatusPill } from "./status-pills"
 
 // Menus are portaled, but React events still bubble to the table row: stop them so picking
@@ -62,7 +62,7 @@ function devOptionNote(fr: FrRow, status: DevStatus, permissions: FrPermissions)
 
 /** Dev status picker with Dev-Done gating and override hints (FR-WKF-001). */
 export function DevStatusMenu({ fr, trigger }: { fr: FrRow; trigger: React.ReactNode }) {
-  const { permissions, requestDevStatus } = useFr()
+  const { permissions, requestDevStatus } = useFrActions()
   const options = DEV_STATUSES.map((status) => ({
     value: status,
     label: <DevStatusPill status={status} />,
@@ -75,7 +75,7 @@ export function DevStatusMenu({ fr, trigger }: { fr: FrRow; trigger: React.React
 
 /** QA status picker; Passed warns when ACs haven't passed, Failed notifies developers (FR-WKF-002). */
 export function QaStatusMenu({ fr, trigger }: { fr: FrRow; trigger: React.ReactNode }) {
-  const { requestQaStatus } = useFr()
+  const { requestQaStatus } = useFrActions()
   const unpassed = fr.acs.filter((ac) => !ac.qaPassed).length
   const options = QA_STATUSES.map((status) => {
     const warn = status === QaStatus.Passed && unpassed > 0

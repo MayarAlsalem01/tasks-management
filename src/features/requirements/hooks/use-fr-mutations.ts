@@ -13,11 +13,12 @@ import type { AcRow, FrRow } from "../types/requirement"
 /** An optimistic change to one FR row and/or one of its ACs. */
 export type FrPatch = { fr?: Partial<FrRow>; ac?: { id: string; changes: Partial<AcRow> } }
 
-function applyPatch(rows: FrRow[], { frId, fr, ac }: FrPatch & { frId: string }) {
+// Rows may extend FrRow (My Tasks adds project and defect data); patches keep those fields.
+function applyPatch<T extends FrRow>(rows: T[], { frId, fr, ac }: FrPatch & { frId: string }): T[] {
   return rows.map((row) => {
     if (row.id !== frId) return row
     const acs = fr?.acs ?? row.acs
-    return { ...row, ...fr, acs: ac ? acs.map((a) => (a.id === ac.id ? { ...a, ...ac.changes } : a)) : acs }
+    return { ...row, ...fr, acs: ac ? acs.map((a) => (a.id === ac.id ? { ...a, ...ac.changes } : a)) : acs } as T
   })
 }
 
@@ -31,8 +32,8 @@ export type RunMutation = (frId: string, action: () => Promise<ActionState>, opt
  * runs the Server Action (which revalidates the server data that replaces the patch), shows
  * a toast for errors (and `success`, when given), and refreshes the FR's drawer detail.
  */
-export function useFrMutations(rows: FrRow[]) {
-  const [optimisticRows, addPatch] = useOptimistic(rows, applyPatch)
+export function useFrMutations<T extends FrRow>(rows: T[]) {
+  const [optimisticRows, addPatch] = useOptimistic(rows, applyPatch<T>)
   const queryClient = useQueryClient()
 
   const run: RunMutation = (frId, action, { patch, success } = {}) =>

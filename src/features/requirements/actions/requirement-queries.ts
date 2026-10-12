@@ -1,6 +1,6 @@
 import "server-only"
 
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm"
+import { and, asc, eq, inArray, isNull, or, type SQL } from "drizzle-orm"
 
 import { ADMIN_ROLES, Role, ROLES } from "@/lib/auth/roles"
 import { db } from "@/lib/db"
@@ -23,8 +23,8 @@ const person = (u: { id: string; fullName: string; deactivatedAt: Date | null })
   deactivated: u.deactivatedAt !== null,
 })
 
-/** ACs of every FR in the project (active ACs only), grouped by FR id. */
-async function acsByFr(projectId: string) {
+/** Active ACs of every FR matching `frWhere` (a condition on `functional_requirements`), grouped by FR id. */
+export async function acsByFr(frWhere: SQL | undefined) {
   const rows = await db
     .select({
       frId: acceptanceCriteria.frId,
@@ -40,7 +40,7 @@ async function acsByFr(projectId: string) {
     })
     .from(acceptanceCriteria)
     .innerJoin(functionalRequirements, eq(functionalRequirements.id, acceptanceCriteria.frId))
-    .where(and(eq(functionalRequirements.projectId, projectId), isNull(acceptanceCriteria.deletedAt)))
+    .where(and(frWhere, isNull(acceptanceCriteria.deletedAt)))
     .orderBy(asc(acceptanceCriteria.sortOrder), asc(acceptanceCriteria.createdAt))
   const map = new Map<string, AcRow[]>()
   for (const { frId, qaFailedAt, ...ac } of rows) {
@@ -49,8 +49,8 @@ async function acsByFr(projectId: string) {
   return map
 }
 
-/** Developer / QA assignees of every FR in the project, grouped by FR id. */
-async function assigneesByFr(projectId: string) {
+/** Developer / QA assignees of every FR matching `frWhere`, grouped by FR id. */
+export async function assigneesByFr(frWhere: SQL | undefined) {
   const rows = await db
     .select({
       frId: frAssignees.frId,
@@ -62,7 +62,7 @@ async function assigneesByFr(projectId: string) {
     .from(frAssignees)
     .innerJoin(functionalRequirements, eq(functionalRequirements.id, frAssignees.frId))
     .innerJoin(users, eq(users.id, frAssignees.userId))
-    .where(eq(functionalRequirements.projectId, projectId))
+    .where(frWhere)
     .orderBy(asc(frAssignees.assignedAt))
   const map = new Map<string, { developers: Person[]; qaEngineers: Person[] }>()
   for (const { frId, role, ...user } of rows) {
@@ -106,8 +106,8 @@ export async function listProjectRequirements(projectId: string): Promise<FrRow[
       .innerJoin(activities, and(eq(activities.id, steps.activityId), isNull(activities.deletedAt)))
       .where(eq(fr.projectId, projectId))
       .orderBy(asc(activities.sortOrder), asc(activities.createdAt), asc(steps.sortOrder), asc(steps.createdAt), asc(fr.sortOrder), asc(fr.frCode)),
-    acsByFr(projectId),
-    assigneesByFr(projectId),
+    acsByFr(eq(fr.projectId, projectId)),
+    assigneesByFr(eq(fr.projectId, projectId)),
   ])
   return rows.map(({ deletedAt, ...row }) => ({
     ...row,

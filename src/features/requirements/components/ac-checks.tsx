@@ -8,12 +8,13 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
-import { reportDefectAction, setAcDevDoneAction, setAcQaPassedAction } from "../actions/requirement-actions"
+import { useAcActions } from "../hooks/use-ac-actions"
 import type { AcRow, FrRow } from "../types/requirement"
 import type { FrPermissions } from "../utils/permissions"
-import { useFr } from "./fr-context"
+import { useFrActions } from "./fr-context"
 
-function CheckButton({ checked, tone, onClick, children }: { checked: boolean; tone: string; onClick: () => void; children: React.ReactNode }) {
+/** "Dev done" / "QA passed" tick button; `tone` is the background class when checked. */
+export function CheckButton({ checked, tone, onClick, children }: { checked: boolean; tone: string; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       type="button"
@@ -46,27 +47,15 @@ type AcChecksProps = {
  * "Set QA status to Failed?" prompt (FR-WKF-002).
  */
 export function AcChecks({ fr, ac, permissions, onDefect, devText, qaPill }: AcChecksProps) {
-  const { run } = useFr()
+  const { run } = useFrActions()
+  const { toggleDev, toggleQa, reportDefect } = useAcActions(run, fr, ac, onDefect)
   const [defectOpen, setDefectOpen] = useState(false)
   const [note, setNote] = useState("")
 
-  const toggleDev = () =>
-    run(fr.id, () => setAcDevDoneAction({ acId: ac.id, value: !ac.devDone }), { patch: { ac: { id: ac.id, changes: { devDone: !ac.devDone } } } })
-
-  const toggleQa = async () => {
-    const passed = !ac.qaPassed
-    const ok = await run(fr.id, () => setAcQaPassedAction({ acId: ac.id, value: passed }), {
-      patch: { ac: { id: ac.id, changes: { qaPassed: passed, ...(passed ? { qaFailed: false } : {}) } } },
-    })
-    if (ok && !passed) onDefect(ac.code)
-  }
-
   const submitDefect = async () => {
-    const ok = await run(fr.id, () => reportDefectAction({ acId: ac.id, note }), { patch: { ac: { id: ac.id, changes: { qaPassed: false, qaFailed: true } } } })
-    if (!ok) return
+    if (!(await reportDefect(note))) return
     setDefectOpen(false)
     setNote("")
-    onDefect(ac.code)
   }
 
   return (

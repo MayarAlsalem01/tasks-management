@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from "next/cache"
 
 import { CacheProfile, CacheTag } from "@/lib/cache-tags"
 
+import { listMyTasks, listUnassignedFrs } from "../actions/my-tasks-queries"
 import { getFrDetail } from "../actions/requirement-detail-queries"
 import { listProjectPeople, listProjectRequirements } from "../actions/requirement-queries"
 
@@ -33,3 +34,20 @@ export async function getCachedFrDetail(frId: string) {
   cacheLife(CacheProfile.Reference)
   return getFrDetail(frId)
 }
+
+/** The viewer's unfinished FRs across their projects (My Tasks). Keyed by user id and admin flag. */
+export async function getMyTasks(userId: string, isAdmin: boolean) {
+  "use cache"
+  cacheTag(CacheTag.Requirements, CacheTag.Users, CacheTag.Projects)
+  cacheLife(CacheProfile.Reference)
+  return listMyTasks({ id: userId, isAdmin })
+}
+
+/** FRs missing a developer or QA engineer (My Tasks, Admin/PO only: callers check the role). */
+export async function getUnassignedFrs() {
+  "use cache"
+  cacheTag(CacheTag.Requirements, CacheTag.Users, CacheTag.Projects)
+  cacheLife(CacheProfile.Reference)
+  return listUnassignedFrs()
+}
+

@@ -1,4 +1,4 @@
-import { NotificationsBell, type NotificationItem } from "@/features/notifications"
+import { NotificationsBell, type NotificationFeed } from "@/features/notifications"
 
 import { UserMenu, type ShellUser } from "./user-menu"
 
@@ -6,15 +6,13 @@ import { UserMenu, type ShellUser } from "./user-menu"
 export function HeaderActions({
   user,
   notifications,
-  unreadCount,
 }: {
   user: ShellUser
-  notifications: NotificationItem[]
-  unreadCount: number
+  notifications: NotificationFeed
 }) {
   return (
     <>
-      <NotificationsBell items={notifications} unreadCount={unreadCount} />
+      <NotificationsBell initial={notifications} />
       <span className="h-6 w-px bg-gray-150" />
       <UserMenu user={user} />
     </>

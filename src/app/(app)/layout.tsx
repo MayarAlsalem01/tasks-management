@@ -11,6 +11,7 @@ import {
   SidebarLoader,
   SidebarSkeleton,
 } from "@/features/app-shell/server"
+import { NotificationsLiveLoader } from "@/features/notifications/server"
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,6 +22,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       mobileTabBar={<Suspense fallback={<MobileTabBarSkeleton />}><MobileTabBarLoader /></Suspense>}
     >
       {children}
+      {/* Renders no UI, so it needs no skeleton. */}
+      <Suspense fallback={null}><NotificationsLiveLoader /></Suspense>
     </AppShell>
   )
 }

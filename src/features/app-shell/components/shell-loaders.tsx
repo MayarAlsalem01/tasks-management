@@ -1,4 +1,5 @@
-import { getNotifications, getUnreadNotificationCount } from "@/features/notifications/server"
+import { NotificationFeedLimit } from "@/features/notifications"
+import { getNotificationFeed } from "@/features/notifications/server"
 import { getAccessibleProjects, getArchivedProjectCount, getProjectNavs } from "@/features/projects/server"
 import { formatRoles } from "@/lib/auth/roles"
 import { requireUser } from "@/lib/auth/session"
@@ -32,23 +33,22 @@ export async function SidebarLoader() {
 
 export async function HeaderActionsLoader() {
   const user = await requireUser()
-  const [notifications, unreadCount] = await Promise.all([getNotifications(user.id), getUnreadNotificationCount(user.id)])
+  const notifications = await getNotificationFeed(user.id, NotificationFeedLimit.Popover)
   return (
     <HeaderActions
       user={{ id: user.id, fullName: user.fullName, email: user.email, rolesLabel: formatRoles(user.roles) }}
       notifications={notifications}
-      unreadCount={unreadCount}
     />
   )
 }
 
 export async function MobileTopBarLoader() {
   const { user, navs } = await loadProjects()
-  const [notifications, unreadCount] = await Promise.all([getNotifications(user.id), getUnreadNotificationCount(user.id)])
-  return <MobileTopBar navs={navs} notifications={notifications} unreadCount={unreadCount} />
+  const notifications = await getNotificationFeed(user.id, NotificationFeedLimit.Popover)
+  return <MobileTopBar navs={navs} notifications={notifications} />
 }
 
 export async function MobileTabBarLoader() {
   const user = await requireUser()
-  return <MobileTabBar unreadCount={await getUnreadNotificationCount(user.id)} />
+  return <MobileTabBar notifications={await getNotificationFeed(user.id, NotificationFeedLimit.Popover)} />
 }

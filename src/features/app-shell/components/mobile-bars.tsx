@@ -5,7 +5,7 @@ import { BellIcon, FolderIcon, SquareCheckIcon, UserIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { NotificationsBell, type NotificationItem } from "@/features/notifications"
+import { NotificationFeedLimit, NotificationsBell, useNotificationFeed, type NotificationFeed } from "@/features/notifications"
 import type { ProjectNav } from "@/features/projects"
 
 import { pageTitle, parseProjectPath } from "../utils/navigation"
@@ -15,11 +15,9 @@ import { ROUTES } from "@/lib/routes"
 export function MobileTopBar({
   navs,
   notifications,
-  unreadCount,
 }: {
   navs: ProjectNav[]
-  notifications: NotificationItem[]
-  unreadCount: number
+  notifications: NotificationFeed
 }) {
   const pathname = usePathname()
   const code = parseProjectPath(pathname)?.code
@@ -27,7 +25,7 @@ export function MobileTopBar({
   return (
     <header className="flex h-13 flex-none items-center gap-2 border-b border-gray-150 bg-white pr-2 pl-4 lg:hidden">
       <span className="flex-1 truncate text-title-2 font-semibold">{title}</span>
-      <NotificationsBell items={notifications} unreadCount={unreadCount} />
+      <NotificationsBell initial={notifications} />
     </header>
   )
 }
@@ -42,8 +40,9 @@ const TABS = [
 ]
 
 /** Fixed bottom tab bar (below `lg`) with 44px+ tap targets, from the mobile design. */
-export function MobileTabBar({ unreadCount }: { unreadCount: number }) {
+export function MobileTabBar({ notifications }: { notifications: NotificationFeed }) {
   const pathname = usePathname()
+  const { unreadCount } = useNotificationFeed(notifications, NotificationFeedLimit.Popover)
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 grid h-17 grid-cols-4 border-t border-gray-150 bg-white pb-3 lg:hidden">
       {TABS.map(({ href, label, Icon, match }) => {

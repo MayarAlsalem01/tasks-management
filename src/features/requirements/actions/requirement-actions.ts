@@ -2,6 +2,7 @@
 
 import { z } from "zod"
 
+import { publishNotifications } from "@/features/notifications/server"
 import { actionErrorState, validationErrorState, type ActionState } from "@/lib/action-state"
 import { requireUser, type CurrentUser } from "@/lib/auth/session"
 import { AppError, GENERIC_ERROR_MESSAGE } from "@/lib/errors"
@@ -36,7 +37,7 @@ import { createActivity, createFr, createStep, setFrArchived } from "./structure
 /**
  * The shared shape of every requirement Server Action: validate → require a session → run
  * the service (which checks project access and role) → invalidate caches (plus the feeds of
- * anyone notified) → `ActionState`. Services return the ids they notified, if any.
+ * anyone notified) → push a live update to anyone notified → `ActionState`. Services return the ids they notified, if any.
  */
 async function run<S extends z.ZodType>(
   schema: S,
@@ -51,6 +52,7 @@ async function run<S extends z.ZodType>(
     const viewer = await requireUser()
     const notified = await service(parsed.data, viewer)
     revalidateRequirements(notified ?? [])
+    publishNotifications(notified ?? [])
     return { status: "success", message }
   } catch (error) {
     return actionErrorState(error, `requirements.${context}`)

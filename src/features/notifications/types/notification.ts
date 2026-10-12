@@ -20,3 +20,9 @@ export type NotificationItem = {
   createdAt: Date
   read: boolean
 }
+
+/** What the bell and the notifications page render: a page of items plus the unread total. */
+export type NotificationFeed = { items: NotificationItem[]; unreadCount: number }
+
+/** Feed sizes: the header popover and the full notifications page. */
+export const NotificationFeedLimit = { Popover: 20, Page: 100 } as const

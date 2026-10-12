@@ -9,25 +9,28 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
 import { useNotificationActions } from "../hooks/use-notification-actions"
-import type { NotificationItem } from "../types/notification"
+import { useNotificationFeed } from "../hooks/use-notification-feed"
+import type { NotificationFeed } from "../types/notification"
 import { NotificationRow } from "./notification-row"
 import { ROUTES } from "@/lib/routes"
 
 /**
- * Unread / All notification list with "Mark all as read". Used inside the header popover
- * and as the full mobile Alerts page (`showViewAll` adds the "View all" link).
+ * Live Unread / All notification list with "Mark all as read", seeded with the server-rendered
+ * `initial` feed of `limit` items. Used inside the header popover and as the full Alerts page
+ * (`showViewAll` adds the "View all" link).
  */
 export function NotificationsPanel({
-  items,
-  unreadCount,
+  initial,
+  limit,
   showViewAll = false,
   onNavigate,
 }: {
-  items: NotificationItem[]
-  unreadCount: number
+  initial: NotificationFeed
+  limit: number
   showViewAll?: boolean
   onNavigate?: () => void
 }) {
+  const { items, unreadCount } = useNotificationFeed(initial, limit)
   const [filter, setFilter] = useState<"unread" | "all">(unreadCount ? "unread" : "all")
   const { open, markAll, pending } = useNotificationActions(onNavigate)
   const visible = filter === "unread" ? items.filter((n) => !n.read) : items

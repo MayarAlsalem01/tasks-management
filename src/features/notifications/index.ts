@@ -1,3 +1,4 @@
 export { NotificationsBell } from "./components/notifications-bell"
 export { NotificationsPanel } from "./components/notifications-panel"
-export type { NotificationItem } from "./types/notification"
+export { useNotificationFeed } from "./hooks/use-notification-feed"
+export { NotificationFeedLimit, type NotificationFeed, type NotificationItem } from "./types/notification"

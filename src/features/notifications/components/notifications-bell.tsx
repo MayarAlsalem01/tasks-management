@@ -5,12 +5,14 @@ import { useState } from "react"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-import type { NotificationItem } from "../types/notification"
+import { useNotificationFeed } from "../hooks/use-notification-feed"
+import { NotificationFeedLimit, type NotificationFeed } from "../types/notification"
 import { NotificationsPanel } from "./notifications-panel"
 
-/** Header bell with the unread badge; opens the notifications popover (FR-NOT-001). */
-export function NotificationsBell({ items, unreadCount }: { items: NotificationItem[]; unreadCount: number }) {
+/** Header bell with the live unread badge; opens the notifications popover (FR-NOT-001). */
+export function NotificationsBell({ initial }: { initial: NotificationFeed }) {
   const [open, setOpen] = useState(false)
+  const { unreadCount } = useNotificationFeed(initial, NotificationFeedLimit.Popover)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
@@ -25,7 +27,7 @@ export function NotificationsBell({ items, unreadCount }: { items: NotificationI
         )}
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[min(400px,calc(100vw-2rem))] p-0">
-        <NotificationsPanel items={items} unreadCount={unreadCount} showViewAll onNavigate={() => setOpen(false)} />
+        <NotificationsPanel initial={initial} limit={NotificationFeedLimit.Popover} showViewAll onNavigate={() => setOpen(false)} />
       </PopoverContent>
     </Popover>
   )

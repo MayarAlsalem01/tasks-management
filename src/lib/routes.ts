@@ -57,6 +57,9 @@ export const ROUTES = {
     projects: "/admin/projects",
     audit: "/admin/audit",
   },
+  api: {
+    pusherAuth: "/api/pusher/auth",
+  },
 } as const
 
 /** `path?key=value` without encoding surprises; skips empty values. */

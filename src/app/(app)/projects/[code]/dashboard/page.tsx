@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/ui/coming-soon"
+import { ProjectDashboardPage } from "@/features/requirements/server"
 
-export default function ProjectDashboardPage() {
-  return <ComingSoon title="Dashboard" description="Progress metrics and the rollup by activity arrives in the next stage." />
+export default function ProjectDashboardRoute({ params, searchParams }: PageProps<"/projects/[code]/dashboard">) {
+  return <ProjectDashboardPage params={params} searchParams={searchParams} />
 }

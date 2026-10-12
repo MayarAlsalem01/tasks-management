@@ -34,6 +34,8 @@ export const SearchParam = {
   Lanes: "lanes",
   /** `1` shows archived rows. */
   Archived: "archived",
+  /** Dashboard trend window in days. */
+  Trend: "trend",
 } as const
 
 /** Values of `SearchParam.New` on project pages. */

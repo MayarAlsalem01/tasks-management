@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from "next/cache"
 
 import { CacheProfile, CacheTag } from "@/lib/cache-tags"
 
+import { listDashboardHistory } from "../actions/dashboard-queries"
 import { listMyTasks, listUnassignedFrs } from "../actions/my-tasks-queries"
 import { getFrDetail } from "../actions/requirement-detail-queries"
 import { listProjectPeople, listProjectRequirements } from "../actions/requirement-queries"
@@ -51,3 +52,10 @@ export async function getUnassignedFrs() {
   return listUnassignedFrs()
 }
 
+/** Lifespans, status history and latest defects of a project's FRs (the dashboard). */
+export async function getDashboardHistory(projectId: string) {
+  "use cache"
+  cacheTag(CacheTag.Requirements, CacheTag.Users)
+  cacheLife(CacheProfile.Reference)
+  return listDashboardHistory(projectId)
+}

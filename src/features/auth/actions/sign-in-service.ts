@@ -12,7 +12,7 @@ import { GENERIC_ERROR_MESSAGE, logError } from "@/lib/errors"
 import type { SignInInput, SignInState } from "../types/sign-in"
 import { failureOutcome, isLocked, MAX_FAILED_ATTEMPTS, secondsUntil } from "../utils/lockout"
 
-type SignInResult = SignInState | { status: "success" }
+type SignInResult = SignInState | { status: "success"; mustChangePassword: boolean }
 
 /**
  * Counts a failed attempt atomically and locks the account once it reaches
@@ -47,12 +47,18 @@ async function recordSuccess(userId: string) {
 /**
  * Signs a user in by username and password through Better Auth, enforcing the lockout
  * and deactivation rules (FR-IAM-002, FR-IAM-003). On success Better Auth creates the
- * session and `nextCookies()` sets the cookie. Expected outcomes are returned as values;
+ * session and `nextCookies()` sets the cookie; success reports whether the user still has to
+ * replace an admin-issued password. Expected outcomes are returned as values;
  * database failures throw and are handled by the calling Server Action.
  */
 export async function signInWithUsername(input: SignInInput): Promise<SignInResult> {
   const [user] = await db
-    .select({ id: users.id, deactivatedAt: users.deactivatedAt, lockedUntil: users.lockedUntil })
+    .select({
+      id: users.id,
+      deactivatedAt: users.deactivatedAt,
+      lockedUntil: users.lockedUntil,
+      mustChangePassword: users.mustChangePassword,
+    })
     .from(users)
     .where(eq(users.username, input.username.toLowerCase()))
 
@@ -76,5 +82,5 @@ export async function signInWithUsername(input: SignInInput): Promise<SignInResu
   await recordSuccess(user.id).catch((error) =>
     logError(error, "auth.recordSuccess", { userId: user.id }),
   )
-  return { status: "success" }
+  return { status: "success", mustChangePassword: user.mustChangePassword }
 }

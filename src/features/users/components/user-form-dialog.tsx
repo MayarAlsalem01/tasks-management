@@ -5,6 +5,7 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { TextField } from "@/components/ui/form-field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PasswordStrength } from "@/components/ui/password-strength"
@@ -25,18 +26,6 @@ type UserFormDialogProps = {
   onClose: () => void
   onToggleActive: (user: AdminUserRow) => void
   onResetPassword: (user: AdminUserRow) => void
-}
-
-function TextField({ id, label, error, optional, ...input }: React.ComponentProps<typeof Input> & { id: string; label: string; error?: string; optional?: boolean }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id} className="text-caption text-gray-700">
-        {label} {optional && <span className="font-normal text-gray-500">(optional)</span>}
-      </Label>
-      <Input id={id} aria-invalid={!!error || undefined} {...input} />
-      {error && <p className="text-caption text-danger-fg">{error}</p>}
-    </div>
-  )
 }
 
 /** New user / Edit user dialog from the Admin design, with multi-role selection. */

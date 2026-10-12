@@ -1,6 +1,16 @@
+import type { notificationTypeEnum } from "@/lib/db/schema"
+
+/** Notification kinds (FR-NOT-001); mirrors the `notification_type` DB enum. */
+export const NotificationType = {
+  Assigned: "ASSIGNED",
+  QaFailed: "QA_FAILED",
+  AcsDevComplete: "ACS_DEV_COMPLETE",
+} as const satisfies Record<string, (typeof notificationTypeEnum.enumValues)[number]>
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
 export type NotificationItem = {
   id: string
-  type: "ASSIGNED" | "QA_FAILED" | "ACS_DEV_COMPLETE"
+  type: NotificationType
   title: string
   message: string
   linkUrl: string | null

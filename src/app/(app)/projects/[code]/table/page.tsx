@@ -1,5 +1,5 @@
-import { ComingSoon } from "@/components/ui/coming-soon"
+import { RequirementsTablePage } from "@/features/requirements/server"
 
-export default function ProjectTablePage() {
-  return <ComingSoon title="Table" description="The requirements table with FR rows, statuses and AC progress arrives in the next stage." />
+export default async function ProjectTablePage({ params }: PageProps<"/projects/[code]/table">) {
+  return <RequirementsTablePage params={params} />
 }

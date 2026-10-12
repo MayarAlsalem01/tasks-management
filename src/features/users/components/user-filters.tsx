@@ -6,40 +6,10 @@ import { useTransition } from "react"
 
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FILTER_ALL as ALL, FilterSelect } from "@/components/ui/filter-select"
 import { ROLE_LABELS, ROLES } from "@/lib/auth/roles"
 
 import type { ProjectOption, UserFilters } from "../types/user"
-
-const ALL = "all"
-
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string
-  value: string | undefined
-  onChange: (value: string | undefined) => void
-  options: { value: string; label: string }[]
-}) {
-  return (
-    <label className="flex items-center gap-1.5 text-caption text-gray-600">
-      {label}
-      <Select value={value ?? ALL} onValueChange={(v) => onChange(v === ALL ? undefined : v)}>
-        <SelectTrigger className="h-8 min-w-32 bg-white">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((o) => (
-            <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </label>
-  )
-}
 
 /** Search box and Role / Project / Status filters for the Users table, kept in the URL. */
 export function UserFiltersBar({ filters, projects }: { filters: UserFilters; projects: ProjectOption[] }) {

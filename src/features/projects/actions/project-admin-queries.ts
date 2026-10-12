@@ -7,7 +7,7 @@ import { db } from "@/lib/db"
 import { functionalRequirements, projectMembers, projects, userRoles, users } from "@/lib/db/schema"
 
 import type { AdminProjectRow, MemberOption, ProjectMember } from "../types/project"
-import { percent } from "../utils/progress"
+import { percent } from "@/lib/progress"
 
 /** Active users holding ADMIN or PO; they can access every project. */
 async function listActiveAdmins(): Promise<ProjectMember[]> {

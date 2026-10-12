@@ -2,6 +2,14 @@ import type { userRoleEnum } from "@/lib/db/schema"
 
 export type Role = (typeof userRoleEnum.enumValues)[number]
 
+/** Role values by name, for checks in code (mirrors the `user_role` DB enum). */
+export const Role = {
+  Admin: "ADMIN",
+  Po: "PO",
+  Developer: "DEVELOPER",
+  Qa: "QA",
+} as const satisfies Record<string, Role>
+
 /** Display order for roles everywhere in the UI. */
 export const ROLES: Role[] = ["ADMIN", "PO", "DEVELOPER", "QA"]
 

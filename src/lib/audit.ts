@@ -1,6 +1,6 @@
 import "server-only"
 
-import type { db } from "@/lib/db"
+import type { DbExecutor } from "@/lib/db"
 import { auditLogs } from "@/lib/db/schema"
 
 /** Audit-log entity names (FR-AUD-001). */
@@ -9,6 +9,8 @@ export const AuditEntity = {
   Project: "project",
   FunctionalRequirement: "functional_requirement",
   AcceptanceCriterion: "acceptance_criterion",
+  Activity: "activity",
+  Step: "step",
 } as const
 export type AuditEntity = (typeof AuditEntity)[keyof typeof AuditEntity]
 
@@ -24,9 +26,6 @@ export const AuditAction = {
   OverrideDevDone: "OVERRIDE_DEV_DONE",
 } as const
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
-
-type Database = typeof db
-type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0]
 
 export type AuditEntry = {
   /** Who made the change. */
@@ -44,7 +43,7 @@ export type AuditEntry = {
  * so the change and its audit entry commit or roll back together. Never include secrets
  * (passwords, tokens) in `oldValues` / `newValues`.
  */
-export async function recordAudit(tx: Database | Transaction, entry: AuditEntry) {
+export async function recordAudit(tx: DbExecutor, entry: AuditEntry) {
   await tx.insert(auditLogs).values({
     userId: entry.userId,
     projectId: entry.projectId ?? null,

@@ -1,5 +1,7 @@
 import "server-only"
 
+export { assertProjectAccess } from "./actions/project-queries"
+export { revalidateProjects } from "./cache/revalidate"
 export {
   getAccessibleProjects,
   getArchivedProjectCount,

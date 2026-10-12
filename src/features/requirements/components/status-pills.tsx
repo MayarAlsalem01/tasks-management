@@ -2,19 +2,28 @@ import { cn } from "cn"
 
 import { Badge } from "@/components/ui/badge"
 
-import type { DevStatus, Priority, QaStatus, SpecStatus } from "../types/status"
+import {
+  DEV_STATUS_LABEL,
+  PRIORITY_LABEL,
+  QA_STATUS_LABEL,
+  SPEC_STATUS_LABEL,
+  type DevStatus,
+  type Priority,
+  type QaStatus,
+  type SpecStatus,
+} from "../types/status"
 import { DevGlyph, FlagGlyph, PriorityGlyph, QaGlyph, SpecGlyph } from "./status-glyphs"
 
-const DEV: Record<DevStatus, { label: string; variant: "secondary" | "default" | "destructive" | "success"; knockout?: string }> = {
-  "not-started": { label: "Not started", variant: "secondary" },
-  "in-progress": { label: "In progress", variant: "default" },
-  blocked: { label: "Blocked", variant: "destructive" },
-  done: { label: "Done", variant: "success", knockout: "var(--color-success-tint)" },
+const DEV: Record<DevStatus, { variant: "secondary" | "default" | "destructive" | "success"; knockout?: string }> = {
+  "not-started": { variant: "secondary" },
+  "in-progress": { variant: "default" },
+  blocked: { variant: "destructive" },
+  done: { variant: "success", knockout: "var(--color-success-tint)" },
 }
 
 /** Dev status: filled tint, square corners, circle glyph. */
 export function DevStatusPill({ status, className }: { status: DevStatus; className?: string }) {
-  const { label, variant, knockout } = DEV[status]
+  const { variant, knockout } = DEV[status]
   return (
     <Badge
       variant={variant}
@@ -22,32 +31,25 @@ export function DevStatusPill({ status, className }: { status: DevStatus; classN
       style={knockout ? ({ "--glyph-knockout": knockout } as React.CSSProperties) : undefined}
     >
       <DevGlyph status={status} />
-      {label}
+      {DEV_STATUS_LABEL[status]}
     </Badge>
   )
 }
 
-const QA: Record<QaStatus, { label: string; tone: string }> = {
-  "not-tested": { label: "Not tested", tone: "border-gray-300 text-gray-650" },
-  passed: { label: "Passed", tone: "border-success-mark text-success-fg" },
-  failed: { label: "Failed", tone: "border-danger-mark text-danger-fg" },
+const QA_TONE: Record<QaStatus, string> = {
+  "not-tested": "border-gray-300 text-gray-650",
+  passed: "border-success-mark text-success-fg",
+  failed: "border-danger-mark text-danger-fg",
 }
 
 /** QA status: outline on white, fully round, shield glyph. */
-export function QaStatusPill({ status, className }: { status: QaStatus; className?: string }) {
-  const { label, tone } = QA[status]
+export function QaStatusPill({ status, label, className }: { status: QaStatus; label?: string; className?: string }) {
   return (
-    <Badge variant="outline" shape="round" className={cn("pr-[9px] pl-[7px]", tone, className)}>
+    <Badge variant="outline" shape="round" className={cn("pr-[9px] pl-[7px]", QA_TONE[status], className)}>
       <QaGlyph status={status} />
-      {label}
+      {label ?? QA_STATUS_LABEL[status]}
     </Badge>
   )
-}
-
-const SPEC_LABEL: Record<SpecStatus, string> = {
-  draft: "Draft",
-  "pending-review": "Pending review",
-  approved: "Approved",
 }
 
 /** Spec status: diamond glyph. `tag` renders a neutral tag; `plain` is for table cells and read-only fields. */
@@ -64,32 +66,31 @@ export function SpecStatusLabel({
     return (
       <Badge variant="neutral" className={className}>
         <SpecGlyph status={status} />
-        {SPEC_LABEL[status]}
+        {SPEC_STATUS_LABEL[status]}
       </Badge>
     )
   }
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
       <SpecGlyph status={status} />
-      {SPEC_LABEL[status]}
+      {SPEC_STATUS_LABEL[status]}
     </span>
   )
 }
 
-const PRIORITY: Record<Priority, { label: string; tone: string }> = {
-  critical: { label: "Critical", tone: "text-danger-fg" },
-  high: { label: "High", tone: "text-priority-high-fg" },
-  medium: { label: "Medium", tone: "text-warning-fg" },
-  low: { label: "Low", tone: "text-muted-foreground" },
+const PRIORITY_TONE: Record<Priority, string> = {
+  critical: "text-danger-fg",
+  high: "text-priority-high-fg",
+  medium: "text-warning-fg",
+  low: "text-muted-foreground",
 }
 
 /** Priority: text plus bars (or the critical block). */
 export function PriorityLabel({ priority, className }: { priority: Priority; className?: string }) {
-  const { label, tone } = PRIORITY[priority]
   return (
-    <span className={cn("inline-flex items-center gap-2 font-medium", tone, className)}>
+    <span className={cn("inline-flex items-center gap-2 font-medium", PRIORITY_TONE[priority], className)}>
       <PriorityGlyph priority={priority} />
-      {label}
+      {PRIORITY_LABEL[priority]}
     </span>
   )
 }

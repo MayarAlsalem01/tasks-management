@@ -90,7 +90,12 @@ export const acceptanceCriteria = pgTable(
       .notNull()
       .references(() => functionalRequirements.id),
     acCode: varchar("ac_code", { length: 10 }).notNull(),
+    // Always filled: composed from Given/When/Then when those are set, or imported as one
+    // sentence (the Excel seed has no GWT split).
     criteriaText: text("criteria_text").notNull(),
+    givenText: text("given_text"),
+    whenText: text("when_text"),
+    thenText: text("then_text"),
     sortOrder: integer("sort_order").notNull().default(0),
     devDone: boolean("dev_done").notNull().default(false),
     devDoneBy: uuid("dev_done_by").references(() => users.id),
@@ -98,6 +103,8 @@ export const acceptanceCriteria = pgTable(
     qaPassed: boolean("qa_passed").notNull().default(false),
     qaPassedBy: uuid("qa_passed_by").references(() => users.id),
     qaPassedAt: timestamp("qa_passed_at", { withTimezone: true }),
+    // Set when QA reports a defect on this AC (the note is a defect comment); cleared on pass.
+    qaFailedAt: timestamp("qa_failed_at", { withTimezone: true }),
     ...timestamps,
     deletedAt,
   },

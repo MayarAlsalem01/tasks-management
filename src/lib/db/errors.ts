@@ -3,6 +3,8 @@ export const UniqueConstraint = {
   Username: "users_username_unique",
   Email: "users_email_unique",
   ProjectCode: "projects_code_key",
+  FrCode: "fr_project_code_key",
+  AcCode: "ac_fr_code_key",
 } as const
 
 /**

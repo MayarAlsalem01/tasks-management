@@ -4,6 +4,7 @@ import { and, asc, count, countDistinct, eq, inArray, isNotNull, isNull, ne, sql
 
 import type { CurrentUser } from "@/lib/auth/session"
 import { db } from "@/lib/db"
+import { AppError } from "@/lib/errors"
 import {
   activities,
   frAssignees,
@@ -72,6 +73,22 @@ async function canAccess(projectId: string, viewer: Viewer) {
     .from(projectMembers)
     .where(and(eq(projectMembers.projectId, projectId), eq(projectMembers.userId, viewer.id)))
   return (row?.n ?? 0) > 0
+}
+
+/**
+ * Loads a project the viewer may work in, for services in other features. Write access also
+ * requires the project to be active, since archived projects are read-only.
+ * @throws {AppError} `NOT_FOUND` when the project is missing, deleted or not accessible (the
+ *   same error for each, so ids can't be probed); `FORBIDDEN` when archived and `write` is set.
+ */
+export async function assertProjectAccess(projectId: string, viewer: Viewer, { write = false } = {}) {
+  const [project] = await db
+    .select({ id: projects.id, code: projects.code, archivedAt: projects.archivedAt })
+    .from(projects)
+    .where(and(eq(projects.id, projectId), isNull(projects.deletedAt)))
+  if (!project || !(await canAccess(project.id, viewer))) throw new AppError("NOT_FOUND", "This project doesn't exist or you don't have access to it.")
+  if (write && project.archivedAt) throw new AppError("FORBIDDEN", "This project is archived and read-only.")
+  return { id: project.id, code: project.code }
 }
 
 /**

@@ -13,9 +13,30 @@ export const SearchParam = {
   Step: "step",
   /** Admin Projects tab. */
   Tab: "tab",
-  /** Opens the "New …" dialog on admin pages. */
+  /** Opens a "New …" dialog (`1` on admin pages; a `NewItem` on project pages). */
   New: "new",
+  /** Parent of the item being created (activity id for a new step, step id for a new FR). */
+  Parent: "parent",
+  /** FR code whose drawer is open in a project view. */
+  Fr: "fr",
+  /** Drawer tab. */
+  Panel: "panel",
+  /** Free-text search. */
+  Query: "q",
+  Assignee: "assignee",
+  Priority: "priority",
+  Dev: "dev",
+  Qa: "qa",
+  Spec: "spec",
+  /** Table grouping. */
+  Group: "group",
+  /** `1` shows archived rows. */
+  Archived: "archived",
 } as const
+
+/** Values of `SearchParam.New` on project pages. */
+export const NewItem = { Activity: "activity", Step: "step", Fr: "fr" } as const
+export type NewItem = (typeof NewItem)[keyof typeof NewItem]
 
 export const AdminProjectsTab = { Active: "active", Archived: "archived" } as const
 export type AdminProjectsTab = (typeof AdminProjectsTab)[keyof typeof AdminProjectsTab]

@@ -6,12 +6,12 @@ import { CheckIcon, ShieldXIcon, UserPlusIcon } from "lucide-react"
 import { UserAvatar } from "@/components/ui/user-avatar"
 import { relativeTime } from "@/lib/format"
 
-import type { NotificationItem } from "../types/notification"
+import { NotificationType, type NotificationItem } from "../types/notification"
 
 const TYPE_ICON = {
-  ASSIGNED: { Icon: UserPlusIcon, tone: "text-cobalt-500" },
-  QA_FAILED: { Icon: ShieldXIcon, tone: "text-danger-fg" },
-  ACS_DEV_COMPLETE: { Icon: CheckIcon, tone: "text-success-fg" },
+  [NotificationType.Assigned]: { Icon: UserPlusIcon, tone: "text-cobalt-500" },
+  [NotificationType.QaFailed]: { Icon: ShieldXIcon, tone: "text-danger-fg" },
+  [NotificationType.AcsDevComplete]: { Icon: CheckIcon, tone: "text-success-fg" },
 }
 
 /** One notification: actor avatar with a type icon, text, FR/project codes, time, unread dot. */

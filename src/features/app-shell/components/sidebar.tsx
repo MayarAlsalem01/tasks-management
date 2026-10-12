@@ -10,15 +10,15 @@ import {
   TableIcon,
   UserIcon,
 } from "lucide-react"
+import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 
 import { ProjectSwitcher, type ProjectNav, type ProjectSummary } from "@/features/projects"
 
 import { parseProjectPath, PROJECT_VIEWS } from "../utils/navigation"
 import { ActivityTree } from "./activity-tree"
-import { ComingSoonHint } from "./coming-soon-button"
 import { NavItem, NavSection } from "./nav-item"
-import { ProjectView, ROUTES, SearchParam } from "@/lib/routes"
+import { NewItem, ProjectView, ROUTES, SearchParam, withQuery } from "@/lib/routes"
 
 const VIEW_ICONS = {
   [ProjectView.Table]: <TableIcon />,
@@ -80,9 +80,14 @@ export function Sidebar({ projects, navs, isAdmin, archivedCount, taskCount }: S
               label="Activities"
               action={
                 isAdmin && (
-                  <ComingSoonHint label="Adding activities is coming soon">
-                    <PlusIcon aria-label="Add activity" className="size-3 text-gray-500" />
-                  </ComingSoonHint>
+                  <Link
+                    href={withQuery(ROUTES.project(current.code), { [SearchParam.New]: NewItem.Activity })}
+                    scroll={false}
+                    aria-label="Add activity"
+                    className="inline-flex size-5 items-center justify-center rounded-xs text-gray-500 outline-none hover:bg-gray-100 hover:text-foreground focus-visible:shadow-focus"
+                  >
+                    <PlusIcon className="size-3" />
+                  </Link>
                 )
               }
             >

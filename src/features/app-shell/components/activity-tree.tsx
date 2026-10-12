@@ -7,8 +7,7 @@ import { useState } from "react"
 
 import type { ProjectNav } from "@/features/projects"
 
-import { ComingSoonHint } from "./coming-soon-button"
-import { SearchParam, withQuery } from "@/lib/routes"
+import { NewItem, ROUTES, SearchParam, withQuery } from "@/lib/routes"
 
 /**
  * Activities → Steps tree for the current project with FR counts. Selecting a step filters
@@ -66,12 +65,14 @@ export function ActivityTree({
               </Link>
             ))}
             {isAdmin && (
-              <ComingSoonHint label="Adding steps is coming soon">
-                <span aria-disabled className="flex h-7 items-center gap-1.5 px-2 text-caption text-gray-500">
-                  <PlusIcon className="size-2.5" />
-                  Add step
-                </span>
-              </ComingSoonHint>
+              <Link
+                href={withQuery(ROUTES.project(project.code), { [SearchParam.New]: NewItem.Step, [SearchParam.Parent]: activity.id })}
+                scroll={false}
+                className="flex h-7 items-center gap-1.5 rounded-md px-2 text-caption text-gray-600 outline-none hover:bg-gray-100 hover:text-foreground focus-visible:shadow-focus"
+              >
+                <PlusIcon className="size-2.5" />
+                Add step
+              </Link>
             )}
           </div>
         )}
